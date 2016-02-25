@@ -80,31 +80,35 @@ var getUnanswered = function (tags) {
             $('.search-results').append(errorElem);
         });
 };
+
+//get inspiration
 var getInspiration = function (tag) {
-    var url = "http://api.stackexchange.com/2.2/tags/" + tag + "/top-answers/all_time";
+    var url = "http://api.stackexchange.com/2.2/tags/" + tag + "/top-answerers/all_time";
     var request = {
         site: 'stackoverflow'
     };
+
     var result = $.ajax({
-            url: url,
-            data: request,
-            dataType: "jsonp",
-            type: "GET"
-        })
-        .done(function (result) {
-            console.log(result);
-            var searchResults = showSearchResults(tag, result.items.length);
-            $('.search-results').html(searchResults);
-            $.each(result.items, function (index, item) {
-                var inspiration = showInspiration(item);
-                $('.results').append(inspiration);
-            });
-        })
-        .fail(function () {
-            alert('error');
+        url: url,
+        data: request,
+        dataType: "jsonp",
+        type: "GET"
+    }).done(function (result) {
+        var searchResults = showSearchResults(tag, result.items.length);
+        $('.search-results').html(searchResults);
+
+        $.each(result.items, function (index, item) {
+            var inspiration = showInspiration(item);
+
+            $('.results').append(inspiration);
         });
-}
+    }).fail(function () {
+        alert('error');
+    });
+};
+
 var showInspiration = function (item) {
+    //alert('banana');
     var result = $('.templates .inspiration').clone();
     var user = result.find('.user a')
         .attr('href', item.user.link)
@@ -113,9 +117,9 @@ var showInspiration = function (item) {
     $(user).append(image);
     result.find('.post-count').text(item.post_count);
     result.find('.score').text(item.score);
-    return result;
-}
 
+    return result;
+};
 
 $(document).ready(function () {
     $('.unanswered-getter').submit(function (e) {
@@ -126,11 +130,11 @@ $(document).ready(function () {
         var tags = $(this).find("input[name='tags']").val();
         getUnanswered(tags);
     });
-
     $('.inspiration-getter').submit(function (event) {
         event.preventDefault();
         $('.results').html('');
-        var tag = $(this).find("input[name='answers']").val();
+        var tag = $(this).find("input[name='answerers']").val();
         getInspiration(tag);
+
     });
 });
